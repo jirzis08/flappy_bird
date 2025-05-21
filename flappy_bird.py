@@ -31,7 +31,7 @@ class ptak (pygame.sprite.Sprite):
        
 
 
-
+print("l")
 
 window_width = 600
 window_height = 800
