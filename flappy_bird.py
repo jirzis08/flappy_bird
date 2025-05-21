@@ -15,23 +15,23 @@ class ptak (pygame.sprite.Sprite):
     
     def player_input(self):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE] and self.rect.bottom >= 300:
+        if keys[pygame.K_SPACE]:
             self.gravity = -10
             self.jump_sound.play ()
+            self.jump_sound.set_volume(2)
 
     def apply_gravity(self):
         self.gravity += 1
         self.rect.y += self.gravity
-        if self.rect.bottom >= 300:
-            self.rect.bottom = 300
+        if self.rect.top <= 0:
+            self.rect.top = 0
+        if self.rect.bottom >= window_height*0.85:
+            self.rect.bottom = window_height*0.85
     
     def update(self):
         self.player_input()
         self.apply_gravity()
        
-
-
-print("l")
 
 window_width = 600
 window_height = 800
