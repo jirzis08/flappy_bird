@@ -32,6 +32,13 @@ class ptak (pygame.sprite.Sprite):
         self.player_input()
         self.apply_gravity()
        
+class prekazka (pygame.sprite.Sprite):
+    def __init__ ()
+    
+    pass
+
+
+
 
 window_width = 600
 window_height = 800
