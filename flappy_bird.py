@@ -8,7 +8,7 @@ class ptak (pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.image = pygame.image.load("flappy_bird_up.png").convert_alpha()
-        self.image = pygame.transform.scale(self.image, (50, 50))
+        self.image = pygame.transform.scale(self.image, (75, 75 ))
         self.rect = self.image.get_rect(bottomleft=(100,0.4*window_height))
         self.gravity = 0
         self.jump_sound = pygame.mixer.Sound ("jumping.mp3")
@@ -25,8 +25,8 @@ class ptak (pygame.sprite.Sprite):
         self.rect.y += self.gravity
         if self.rect.top <= 0:
             self.rect.top = 0
-        if self.rect.bottom >= window_height*0.85:
-            self.rect.bottom = window_height*0.85
+        if self.rect.bottom >= window_height*0.87:
+            self.rect.bottom = window_height*0.87
     
     def update(self):
         self.player_input()
