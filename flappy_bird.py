@@ -49,28 +49,14 @@ class prekazka (pygame.sprite.Sprite):
             self.image = image
             self.rect = self.image.get_rect(topleft=(x, y + prekazka_gap // 2))
         self.speed = 6
-<<<<<<< HEAD
-<<<<<<< HEAD
         self.skore = False
-=======
->>>>>>> origin/main
-=======
->>>>>>> origin/main
 
     def update(self):
         self.rect.x -= 3.5  
         self.destroy()
         
     def destroy(self):
-<<<<<<< HEAD
-<<<<<<< HEAD
         if self.rect.right < 0: 
-=======
-        if self.rect.x < 0: 
->>>>>>> origin/main
-=======
-        if self.rect.x < 0: 
->>>>>>> origin/main
           self.kill()
     
 def is_collision():
@@ -105,8 +91,6 @@ prekazky = pygame.sprite.Group()
 spawn_prekazka = pygame.USEREVENT
 pygame.time.set_timer(spawn_prekazka, 1500)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 text_font = pygame.font.Font("PixelifySans.ttf",100)
 text_surface = text_font.render("Prohrál si!", True, "Black")
 text_rect = text_surface.get_rect(center=(window_width/2, window_height/2))
@@ -124,10 +108,6 @@ skore_font = pygame.font.Font ("PixelifySans.ttf",45)
 high_skore_font = pygame.font.Font (None,45)
 
 
-=======
->>>>>>> origin/main
-=======
->>>>>>> origin/main
 game_active = is_collision()
 
 while True:
@@ -156,14 +136,6 @@ while True:
             prekazky.add(spodek_prekazky, vrsek_prekazky)
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main
-=======
-
->>>>>>> origin/main
     if game_active:
  
         
@@ -178,8 +150,6 @@ while True:
         
         pygame.draw.rect(screen, ground_color, ground_rect)
         
-<<<<<<< HEAD
-<<<<<<< HEAD
         for pipe in prekazky:
             if pipe.rect.right < hrac.sprite.rect.left and not pipe.skore:
                 skore += 0.5  
@@ -194,14 +164,6 @@ while True:
     else:
         screen.blit (text_surface, text_rect,)
         screen.blit (text_surface_2, text_rect_2)
-=======
-        game_active = is_collision()
-
->>>>>>> origin/main
-=======
-        game_active = is_collision()
-
->>>>>>> origin/main
         
 
     pygame.display.update()
