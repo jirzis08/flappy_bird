@@ -11,9 +11,18 @@ skore = 0
 class ptak (pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load("flappy_bird_up.png").convert_alpha()
-        self.image = pygame.transform.scale(self.image, (75, 75 ))
+        
+        bird_up = pygame.image.load("flappy_bird_up.png").convert_alpha()
+        bird_up = pygame.transform.scale(bird_up, (75,75))
+        bird_down = pygame.image.load("flappy_bird_down.png").convert_alpha()
+        bird_down = pygame.transform.scale(bird_down, (90,90))
+        
+        self.flying_images = [bird_up, bird_down] 
+        self.flying_index = 0 
+        self.image = self.flying_images [self.flying_index] 
         self.rect = self.image.get_rect(bottomleft=(100,0.4*window_height))
+        self.rect.inflate_ip(-15, -15)
+
         self.gravity = 0
         self.jump_sound = pygame.mixer.Sound ("jumping.mp3")
     
@@ -31,11 +40,15 @@ class ptak (pygame.sprite.Sprite):
         if self.rect.bottom >= window_height*0.87:
             self.rect.bottom = window_height*0.87
 
+    def animation (self):
+        self.flying_index += 0.1
+        self.image = self.flying_images [int(self.flying_index) % len(self.flying_images)] 
     
-
     def update(self):
         self.player_input()
         self.apply_gravity()
+        self.animation ()
+
 
 class prekazka (pygame.sprite.Sprite):
     def __init__(self, x, y, is_top=False):
@@ -63,7 +76,10 @@ def is_collision():
     if pygame.sprite.spritecollide(hrac.sprite, prekazky, False): 
         prekazky.empty()
         return False
+    if hrac.sprite.rect.bottom >= window_height * 0.87:
+        return False
     return True
+    
 
 
 
@@ -97,7 +113,7 @@ text_rect = text_surface.get_rect(center=(window_width/2, window_height/2))
 
 text_font_2 = pygame.font.Font("PixelifySans.ttf",30)
 text_surface_2 = text_font_2.render("Stiskni mezerník pro restart", True, "Black")
-text_rect_2 = text_surface_2.get_rect(center=(300, 475))
+text_rect_2 = text_surface_2.get_rect(center=(300, 575))
 
 text_font_start = pygame.font.Font("PixelifySans.ttf",30)
 text_surface_start = text_font_start.render("Stiskni mezerník pro start", True, "Black")
@@ -151,10 +167,11 @@ while True:
         pygame.draw.rect(screen, ground_color, ground_rect)
         
         for pipe in prekazky:
-            if pipe.rect.right < hrac.sprite.rect.left and not pipe.skore:
-                skore += 0.5  
-                pipe.skore = True
-        
+            if not pipe.skore and not pipe.rect.top < 0:  # Only count bottom pipes
+                if pipe.rect.right < hrac.sprite.rect.left:
+                    skore += 1
+                    pipe.skore = True
+       
         skore_surface = skore_font.render(str(int(skore)), True, "Black")
         skore_rect = skore_surface.get_rect(topleft=(window_width / 2, 30))
         screen.blit(skore_surface, skore_rect)
@@ -162,9 +179,15 @@ while True:
         game_active = is_collision()
     
     else:
+        
+        text_font_skore = pygame.font.Font("PixelifySans.ttf",45)
+        text_surface_skore = text_font_skore.render(f"Tvé skóre je: {int(skore)}", True, "Black")
+        text_rect_skore = text_surface_skore.get_rect(center=(300, 500))
+        
         screen.blit (text_surface, text_rect,)
         screen.blit (text_surface_2, text_rect_2)
+        screen.blit (text_surface_skore, text_rect_skore)
         
 
     pygame.display.update()
-    clock.tick(60)  
+    clock.tick(60)   
