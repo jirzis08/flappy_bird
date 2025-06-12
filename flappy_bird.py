@@ -21,7 +21,6 @@ class ptak (pygame.sprite.Sprite):
         self.flying_index = 0 
         self.image = self.flying_images [self.flying_index] 
         self.rect = self.image.get_rect(bottomleft=(100,0.4*window_height))
-        self.rect.inflate_ip(-15, -15)
 
         self.gravity = 0
         self.jump_sound = pygame.mixer.Sound ("jumping.mp3")
@@ -41,7 +40,7 @@ class ptak (pygame.sprite.Sprite):
             self.rect.bottom = window_height*0.87
 
     def animation (self):
-        self.flying_index += 0.1
+        self.flying_index += 0.05
         self.image = self.flying_images [int(self.flying_index) % len(self.flying_images)] 
     
     def update(self):
@@ -107,21 +106,21 @@ prekazky = pygame.sprite.Group()
 spawn_prekazka = pygame.USEREVENT
 pygame.time.set_timer(spawn_prekazka, 1500)
 
-text_font = pygame.font.Font("PixelifySans.ttf",100)
+text_font = pygame.font.Font(None,100)
 text_surface = text_font.render("Prohrál si!", True, "Black")
 text_rect = text_surface.get_rect(center=(window_width/2, window_height/2))
 
-text_font_2 = pygame.font.Font("PixelifySans.ttf",30)
+text_font_2 = pygame.font.Font(None ,30)
 text_surface_2 = text_font_2.render("Stiskni mezerník pro restart", True, "Black")
 text_rect_2 = text_surface_2.get_rect(center=(300, 575))
 
-text_font_start = pygame.font.Font("PixelifySans.ttf",30)
+text_font_start = pygame.font.Font(None,30)
 text_surface_start = text_font_start.render("Stiskni mezerník pro start", True, "Black")
 text_rect_start = text_surface_start.get_rect(center=(300, 475))
 
-skore_font = pygame.font.Font ("PixelifySans.ttf",45)
+skore_font = pygame.font.Font (None,45)
 
-high_skore_font = pygame.font.Font (None,45)
+
 
 
 game_active = is_collision()
@@ -158,11 +157,11 @@ while True:
         screen.blit(background_surface,(0,0))
 
      
-        prekazky.draw(screen)
         prekazky.update()
+        prekazky.draw(screen)
 
-        hrac.draw(screen)
         hrac.update()
+        hrac.draw(screen)
         
         pygame.draw.rect(screen, ground_color, ground_rect)
         
@@ -179,14 +178,15 @@ while True:
         game_active = is_collision()
     
     else:
+        hrac.draw(screen)
+
         
-        text_font_skore = pygame.font.Font("PixelifySans.ttf",45)
-        text_surface_skore = text_font_skore.render(f"Tvé skóre je: {int(skore)}", True, "Black")
-        text_rect_skore = text_surface_skore.get_rect(center=(300, 500))
+        skore_surface = skore_font.render(f"Tvé skóre je: {int(skore)}", True, "Black")
+        skore_rect = skore_surface.get_rect(center=(300, 500))
         
         screen.blit (text_surface, text_rect,)
         screen.blit (text_surface_2, text_rect_2)
-        screen.blit (text_surface_skore, text_rect_skore)
+        screen.blit (skore_surface, skore_rect)
         
 
     pygame.display.update()
