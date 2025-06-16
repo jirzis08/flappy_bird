@@ -5,7 +5,7 @@ pygame.init()
 
 window_width = 600
 window_height = 800
-prekazka_gap = 250
+prekazka_mezera = 250
 skore = 0 
 
 class ptak (pygame.sprite.Sprite):
@@ -24,11 +24,7 @@ class ptak (pygame.sprite.Sprite):
 
         self.gravity = 0
         self.jump_sound = pygame.mixer.Sound ("jumping.mp3")
-    
-    def player_input(self):
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
-            self.gravity = -10
+        self.jump_sound.set_volume (0.5)
         
 
     def apply_gravity(self):
@@ -43,8 +39,7 @@ class ptak (pygame.sprite.Sprite):
         self.flying_index += 0.05
         self.image = self.flying_images [int(self.flying_index) % len(self.flying_images)] 
     
-    def update(self):
-        self.player_input()
+    def update(self): 
         self.apply_gravity()
         self.animation ()
 
@@ -56,10 +51,10 @@ class prekazka (pygame.sprite.Sprite):
         if is_top:
             image = pygame.transform.flip(image, False, True)
             self.image = image
-            self.rect = self.image.get_rect(bottomleft=(x, y - prekazka_gap // 2))
+            self.rect = self.image.get_rect(bottomleft=(x, y - prekazka_mezera // 2))
         else:
             self.image = image
-            self.rect = self.image.get_rect(topleft=(x, y + prekazka_gap // 2))
+            self.rect = self.image.get_rect(topleft=(x, y + prekazka_mezera // 2))
         self.speed = 6
         self.skore = False
 
@@ -79,8 +74,6 @@ def is_collision():
         return False
     return True
     
-
-
 
 screen = pygame.display.set_mode((window_width, window_height))
 
@@ -106,6 +99,7 @@ prekazky = pygame.sprite.Group()
 spawn_prekazka = pygame.USEREVENT
 pygame.time.set_timer(spawn_prekazka, 1500)
 
+
 text_font = pygame.font.Font(None,100)
 text_surface = text_font.render("Prohrál si!", True, "Black")
 text_rect = text_surface.get_rect(center=(window_width/2, window_height/2))
@@ -120,10 +114,8 @@ text_rect_start = text_surface_start.get_rect(center=(300, 475))
 
 skore_font = pygame.font.Font (None,45)
 
+game_stav = "menu"
 
-
-
-game_active = is_collision()
 
 while True:
 
@@ -131,30 +123,46 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit() 
             exit() 
+        
         if event.type == pygame.KEYDOWN:
-            if game_active:
-                if event.key == pygame.K_SPACE:
-                    hrac.sprite.gravity = -10
+            if event.key == pygame.K_SPACE:
+                if game_stav == "menu":
+                    game_stav = "hraní"
+                    skore = 0
+                    hrac.empty()
+                    hrac.add(ptak())
+                    prekazky.empty()
+                
+                elif game_stav == "game_over":
+                    game_stav = "hraní"
+                    skore = 0
+                    hrac.empty()
+                    hrac.add(ptak())
+                    prekazky.empty()
+                
+                elif game_stav == "hraní":
+                    hrac.sprite.gravity = -13
                     hrac.sprite.jump_sound.play()
-            else:
-                game_active = True
-                hrac.empty()
-                hrac.add(ptak())
-                prekazky.empty()
-                skore = 0
 
-        if event.type == spawn_prekazka and game_active:
-            max_vyska = window_height - prekazka_gap - (window_height * 0.13) - 50
+
+        if event.type == spawn_prekazka and game_stav == "hraní":
+            max_vyska = window_height - prekazka_mezera - (window_height * 0.13) - 50
             vyska_prekazky = random.randint(150, int(max_vyska))
             spodek_prekazky = prekazka(window_width + 100, vyska_prekazky, is_top=False)
             vrsek_prekazky = prekazka(window_width + 100, vyska_prekazky, is_top=True)
             prekazky.add(spodek_prekazky, vrsek_prekazky)
 
 
-    if game_active:
- 
+    
+    if game_stav == "menu":
         
-        screen.blit(background_surface,(0,0))
+        screen.blit (background_surface,(0,0))
+
+        screen.blit (text_surface_start, text_rect_start)
+
+    elif game_stav == "hraní":
+
+        screen.blit (background_surface,(0,0))
 
      
         prekazky.update()
@@ -162,11 +170,11 @@ while True:
 
         hrac.update()
         hrac.draw(screen)
-        
+  
         pygame.draw.rect(screen, ground_color, ground_rect)
         
         for pipe in prekazky:
-            if not pipe.skore and not pipe.rect.top < 0:  # Only count bottom pipes
+            if not pipe.skore and not pipe.rect.top < 0:  
                 if pipe.rect.right < hrac.sprite.rect.left:
                     skore += 1
                     pipe.skore = True
@@ -175,19 +183,22 @@ while True:
         skore_rect = skore_surface.get_rect(topleft=(window_width / 2, 30))
         screen.blit(skore_surface, skore_rect)
         
-        game_active = is_collision()
+        if not is_collision():
+            game_stav = "game_over"
     
-    else:
-        hrac.draw(screen)
-
+    elif game_stav == "game_over":
         
-        skore_surface = skore_font.render(f"Tvé skóre je: {int(skore)}", True, "Black")
+        screen.blit(background_surface, (0, 0))
+        prekazky.draw(screen)
+        pygame.draw.rect(screen, ground_color, ground_rect)
+
+        skore_surface = skore_font.render(f"Tvé dosažené skóre je: {int(skore)}", True, "Black")
         skore_rect = skore_surface.get_rect(center=(300, 500))
         
         screen.blit (text_surface, text_rect,)
         screen.blit (text_surface_2, text_rect_2)
         screen.blit (skore_surface, skore_rect)
-        
+    
 
     pygame.display.update()
-    clock.tick(60)   
+    clock.tick(60)        
