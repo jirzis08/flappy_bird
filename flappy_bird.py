@@ -25,6 +25,9 @@ class ptak (pygame.sprite.Sprite):
         self.gravity = 0
         self.jump_sound = pygame.mixer.Sound ("jumping.mp3")
         self.jump_sound.set_volume (0.5)
+
+        self.smrt_zvuk = pygame.mixer.Sound ("smrt.mp3")
+        self.smrt_zvuk.set_volume (0.2)
         
 
     def apply_gravity(self):
@@ -104,18 +107,28 @@ text_font = pygame.font.Font(None,100)
 text_surface = text_font.render("Prohrál si!", True, "Black")
 text_rect = text_surface.get_rect(center=(window_width/2, window_height/2))
 
-text_font_2 = pygame.font.Font(None ,30)
-text_surface_2 = text_font_2.render("Stiskni mezerník pro restart", True, "Black")
-text_rect_2 = text_surface_2.get_rect(center=(300, 575))
-
-text_font_start = pygame.font.Font(None,30)
-text_surface_start = text_font_start.render("Stiskni mezerník pro start", True, "Black")
-text_rect_start = text_surface_start.get_rect(center=(300, 475))
-
 skore_font = pygame.font.Font (None,45)
 
-game_stav = "menu"
+start_button_color = (100, 200, 100)
+start_button_hover_color = (80, 180, 80)
+start_button_rect = pygame.Rect(200, 400, 200, 60)
+start_button_font = pygame.font.Font(None, 40)
+start_button_text = start_button_font.render("Hrát", True, "Black")
+start_button_text_rect = start_button_text.get_rect(center=start_button_rect.center)
 
+restart_button_color = (100, 200, 100)
+restart_button_hover_color = (80, 180, 80)
+restart_button_rect = pygame.Rect(200, 525, 200, 60)
+restart_button_text = start_button_font.render("Hrát znovu", True, "Black")
+restart_button_text_rect = restart_button_text.get_rect(center=restart_button_rect.center)
+
+quit_button_color = (200, 100, 100)
+quit_button_hover_color = (180, 80, 80)
+quit_button_rect = pygame.Rect(200, 600, 200, 60)
+quit_button_text = start_button_font.render("Skončit", True, "Black")
+quit_button_text_rect = quit_button_text.get_rect(center=quit_button_rect.center)
+
+game_stav = "menu"
 
 while True:
 
@@ -124,23 +137,28 @@ while True:
             pygame.quit() 
             exit() 
         
+        if game_stav == "menu" and event.type == pygame.MOUSEBUTTONDOWN:
+            if start_button_rect.collidepoint(event.pos):
+                game_stav = "hraní"
+                skore = 0
+                hrac.empty()
+                hrac.add(ptak())
+                prekazky.empty()
+        
+        if game_stav == "game_over" and event.type == pygame.MOUSEBUTTONDOWN:
+            if restart_button_rect.collidepoint(event.pos):
+                game_stav = "hraní"
+                skore = 0
+                hrac.empty()
+                hrac.add(ptak())
+                prekazky.empty()
+            elif quit_button_rect.collidepoint(event.pos):
+                pygame.quit()
+                exit()
+        
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                if game_stav == "menu":
-                    game_stav = "hraní"
-                    skore = 0
-                    hrac.empty()
-                    hrac.add(ptak())
-                    prekazky.empty()
-                
-                elif game_stav == "game_over":
-                    game_stav = "hraní"
-                    skore = 0
-                    hrac.empty()
-                    hrac.add(ptak())
-                    prekazky.empty()
-                
-                elif game_stav == "hraní":
+                if game_stav == "hraní":
                     hrac.sprite.gravity = -13
                     hrac.sprite.jump_sound.play()
 
@@ -155,10 +173,14 @@ while True:
 
     
     if game_stav == "menu":
-        
-        screen.blit (background_surface,(0,0))
+        screen.blit(background_surface, (0, 0))
 
-        screen.blit (text_surface_start, text_rect_start)
+        if start_button_rect.collidepoint(pygame.mouse.get_pos()):
+            pygame.draw.rect(screen, start_button_hover_color, start_button_rect)
+        else:
+            pygame.draw.rect(screen, start_button_color, start_button_rect)
+
+        screen.blit(start_button_text, start_button_text_rect)
 
     elif game_stav == "hraní":
 
@@ -183,22 +205,40 @@ while True:
         skore_rect = skore_surface.get_rect(topleft=(window_width / 2, 30))
         screen.blit(skore_surface, skore_rect)
         
+        
+        
         if not is_collision():
             game_stav = "game_over"
+            hrac.sprite.smrt_zvuk.play()
     
     elif game_stav == "game_over":
         
+        
         screen.blit(background_surface, (0, 0))
-        prekazky.draw(screen)
         pygame.draw.rect(screen, ground_color, ground_rect)
 
+        prekazky.draw(screen)
+        
+        hrac.draw(screen)
+        
         skore_surface = skore_font.render(f"Tvé dosažené skóre je: {int(skore)}", True, "Black")
         skore_rect = skore_surface.get_rect(center=(300, 500))
         
-        screen.blit (text_surface, text_rect,)
-        screen.blit (text_surface_2, text_rect_2)
-        screen.blit (skore_surface, skore_rect)
     
+        if restart_button_rect.collidepoint(pygame.mouse.get_pos()):
+            pygame.draw.rect(screen, restart_button_hover_color, restart_button_rect)
+        else:
+            pygame.draw.rect(screen, restart_button_color, restart_button_rect)
+
+        if quit_button_rect.collidepoint(pygame.mouse.get_pos()):
+            pygame.draw.rect(screen, quit_button_hover_color, quit_button_rect)
+        else:
+            pygame.draw.rect(screen, quit_button_color, quit_button_rect)
+
+        screen.blit(quit_button_text, quit_button_text_rect)       
+        screen.blit(restart_button_text, restart_button_text_rect)
+        screen.blit (text_surface, text_rect)
+        screen.blit (skore_surface, skore_rect)
 
     pygame.display.update()
     clock.tick(60)        
