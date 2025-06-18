@@ -62,7 +62,7 @@ class prekazka (pygame.sprite.Sprite):
         self.skore = False
 
     def update(self):
-        self.rect.x -= 3.5  
+        self.rect.x -= 3
         self.destroy()
         
     def destroy(self):
@@ -70,9 +70,10 @@ class prekazka (pygame.sprite.Sprite):
           self.kill()
     
 def is_collision():
+    
     if pygame.sprite.spritecollide(hrac.sprite, prekazky, False): 
-        prekazky.empty()
         return False
+    
     if hrac.sprite.rect.bottom >= window_height * 0.87:
         return False
     return True
@@ -100,12 +101,16 @@ hrac.add(ptak())
 prekazky = pygame.sprite.Group()
 
 spawn_prekazka = pygame.USEREVENT
-pygame.time.set_timer(spawn_prekazka, 1500)
+pygame.time.set_timer(spawn_prekazka, 2000)
 
 
 text_font = pygame.font.Font(None,100)
 text_surface = text_font.render("Prohrál si!", True, "Black")
 text_rect = text_surface.get_rect(center=(window_width/2, window_height/2))
+
+start_font = pygame.font.Font(None,70)
+start_surface = start_font.render ("Flappy Bird", True, "Black")
+start_rect = start_surface.get_rect (center= (300,300))
 
 skore_font = pygame.font.Font (None,45)
 
@@ -128,6 +133,12 @@ quit_button_rect = pygame.Rect(200, 600, 200, 60)
 quit_button_text = start_button_font.render("Skončit", True, "Black")
 quit_button_text_rect = quit_button_text.get_rect(center=quit_button_rect.center)
 
+quit_button_color_1 = (200, 100, 100)
+quit_button_hover_color_1 = (180, 80, 80)
+quit_button_rect_1 = pygame.Rect(200, 480, 200, 60)
+quit_button_text_1 = start_button_font.render("Skončit", True, "Black")
+quit_button_text_rect_1 = quit_button_text_1.get_rect(center=quit_button_rect_1.center)
+
 game_stav = "menu"
 
 while True:
@@ -144,6 +155,11 @@ while True:
                 hrac.empty()
                 hrac.add(ptak())
                 prekazky.empty()
+                pygame.time.set_timer(spawn_prekazka, 2000)
+            
+            elif quit_button_rect_1.collidepoint(event.pos):
+                pygame.quit()
+                exit()
         
         if game_stav == "game_over" and event.type == pygame.MOUSEBUTTONDOWN:
             if restart_button_rect.collidepoint(event.pos):
@@ -152,6 +168,8 @@ while True:
                 hrac.empty()
                 hrac.add(ptak())
                 prekazky.empty()
+                pygame.time.set_timer(spawn_prekazka, 2000)
+            
             elif quit_button_rect.collidepoint(event.pos):
                 pygame.quit()
                 exit()
@@ -173,14 +191,22 @@ while True:
 
     
     if game_stav == "menu":
-        screen.blit(background_surface, (0, 0))
 
+        screen.blit(background_surface, (0, 0))
+        screen.blit (start_surface, start_rect) 
+        
         if start_button_rect.collidepoint(pygame.mouse.get_pos()):
             pygame.draw.rect(screen, start_button_hover_color, start_button_rect)
         else:
             pygame.draw.rect(screen, start_button_color, start_button_rect)
 
+        if quit_button_rect_1.collidepoint(pygame.mouse.get_pos()):
+            pygame.draw.rect(screen, quit_button_hover_color_1, quit_button_rect_1)
+        else:
+            pygame.draw.rect(screen, quit_button_color_1, quit_button_rect_1)
+
         screen.blit(start_button_text, start_button_text_rect)
+        screen.blit(quit_button_text_1, quit_button_text_rect_1)   
 
     elif game_stav == "hraní":
 
@@ -213,14 +239,11 @@ while True:
     
     elif game_stav == "game_over":
         
-        
         screen.blit(background_surface, (0, 0))
+        prekazky.draw(screen)
+        hrac.draw(screen)
         pygame.draw.rect(screen, ground_color, ground_rect)
 
-        prekazky.draw(screen)
-        
-        hrac.draw(screen)
-        
         skore_surface = skore_font.render(f"Tvé dosažené skóre je: {int(skore)}", True, "Black")
         skore_rect = skore_surface.get_rect(center=(300, 500))
         
