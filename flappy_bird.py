@@ -55,6 +55,7 @@ class prekazka (pygame.sprite.Sprite):
         image = pygame.image.load("flappy_bird_pipe.png").convert_alpha()
         if is_top:
             image = pygame.transform.flip(image, False, True)
+
             self.image = image
             self.rect = self.image.get_rect(bottomleft=(x, y - prekazka_gap // 2))
         else:
